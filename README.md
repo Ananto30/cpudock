@@ -2,7 +2,7 @@
 
 A simple, lightweight system tray indicator for Linux that displays real-time CPU usage, RAM usage, and CPU temperature. Built with Python, GTK3, and AppIndicator.
 
-![screenshot](https://user-images.githubusercontent.com/yourusername/cpudock-screenshot.png) <!-- Replace with your screenshot if available -->
+![screenshot](./screenshot.png)
 
 ## Features
 
