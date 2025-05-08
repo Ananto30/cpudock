@@ -32,13 +32,18 @@ class SysIndicator:
         )
         self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
 
-        # Empty menu with just a Quit option
+        # Menu with "Show Top RAM" and "Quit"
         self.menu = Gtk.Menu()
+
+        show_top_item = Gtk.MenuItem(label="Show Top RAM Users")
+        show_top_item.connect("activate", self.show_top_ram)
+        self.menu.append(show_top_item)
+
         quit_item = Gtk.MenuItem(label="Quit")
         quit_item.connect("activate", self.quit)
         self.menu.append(quit_item)
-        self.menu.show_all()
 
+        self.menu.show_all()
         self.indicator.set_menu(self.menu)
         self.update_label()
 
@@ -47,6 +52,32 @@ class SysIndicator:
         self.indicator.set_label(stats, "")
         GLib.timeout_add_seconds(2, self.update_label)  # update every 2 seconds
         return False
+
+    def show_top_ram(self, _):
+        # Get top 10 processes by RAM usage
+        procs = []
+        for p in psutil.process_iter(['pid', 'name', 'memory_info']):
+            try:
+                mem = p.info['memory_info'].rss
+                procs.append((mem, p.info['pid'], p.info['name']))
+            except Exception:
+                continue
+        procs.sort(reverse=True)
+        top = procs[:10]
+        msg = "\n".join(
+            f"{name} (PID {pid}): {mem/1024/1024:.1f} MB"
+            for mem, pid, name in top
+        )
+        dialog = Gtk.MessageDialog(
+            None,
+            0,
+            Gtk.MessageType.INFO,
+            Gtk.ButtonsType.OK,
+            "Top 10 RAM-Using Processes"
+        )
+        dialog.format_secondary_text(msg if msg else "No process info available.")
+        dialog.run()
+        dialog.destroy()
 
     def quit(self, source):
         Gtk.main_quit()

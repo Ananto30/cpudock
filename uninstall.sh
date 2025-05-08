@@ -18,7 +18,7 @@ fi
 
 # Ask if user wants to remove the script itself
 read -p "❓ Do you want to delete the script itself at $SCRIPT_PATH? [y/N]: " confirm
-confirm=${confirm,,}  # to lowercase
+confirm=$(echo "$confirm" | tr '[:upper:]' '[:lower:]')  # to lowercase
 
 if [[ "$confirm" == "y" ]]; then
     if [ -f "$SCRIPT_PATH" ]; then
